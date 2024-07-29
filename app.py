@@ -130,7 +130,7 @@ from werkzeug.utils import secure_filename
 import pandas as pd
 
 # Load environment variables from .env file
-load_dotenv()
+# load_dotenv()
 
 app = Flask(__name__)
 CORS(app)
@@ -162,7 +162,7 @@ def ReturnUserAnswer(userQuestion):
     try:
         # Create the agent with the OpenAI API key and the uploaded CSV file
         agent = create_csv_agent(
-            ChatOpenAI(temperature=0, model="gpt-3.5-turbo-1106", api_key="sk-proj-9K8bs2tijUSed8UnDRwVT3BlbkFJvmqxxjUXvdFzMb0dzZrX"),
+            ChatOpenAI(temperature=0, model="gpt-3.5-turbo-1106", api_key="sk-proj-TXXyzfrcydLc0v8r6tQlT3BlbkFJ8y4eAz6z8Hp41Me6fM1L"),
             last_uploaded_file,
             verbose=True,
         )
