@@ -162,7 +162,7 @@ def ReturnUserAnswer(userQuestion):
     try:
         # Create the agent with the OpenAI API key and the uploaded CSV file
         agent = create_csv_agent(
-            ChatOpenAI(temperature=0, model="gpt-3.5-turbo-1106", api_key="sk-proj-FvqMEq3YoR8KRUHOdEYpT3BlbkFJ8hkDrfQ8RqvdBp0PoKlD"),
+            ChatOpenAI(temperature=0, model="gpt-3.5-turbo-1106", api_key="sk-proj-9K8bs2tijUSed8UnDRwVT3BlbkFJvmqxxjUXvdFzMb0dzZrX"),
             last_uploaded_file,
             verbose=True,
         )
