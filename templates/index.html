@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hospital Patient Query</title>
+    <!-- Include Bootstrap CSS -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .container {
+            margin-top: 50px;
+        }
+        .card-header {
+            background-color: #007bff;
+            color: white;
+        }
+        .response-container {
+            margin-top: 20px;
+        }
+        .alert-heading {
+            font-size: 1.5rem;
+        }
+        .spinner-border {
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <!-- Response History Section -->
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Response History</h2>
+                    </div>
+                    <div class="card-body">
+                        <ul id="responseHistory" class="list-group list-group-flush">
+                            <!-- Dynamic list items will be appended here -->
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Question Form and Latest Response Section -->
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h1>Hospital Patient Query</h1>
+                    </div>
+                    <div class="card-body">
+                        <!-- Question Form -->
+                        <form id="questionForm"  action="/" method="POST">
+                            <div class="form-group mb-3">
+                                <label for="questionInput">Enter your question:</label>
+                                <input type="text" class="form-control" id="questionInput" placeholder="Type your question here" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary" id="submitButton">
+                                Submit
+                            </button>
+                            <div id="loadingSpinner" class="spinner-border text-primary" role="status" style="display: none;">
+                                <span class="sr-only">Loading...</span>
+                            </div>
+                        </form>
+
+                        <!-- Error Alert -->
+                        <div id="errorAlert" class="alert alert-danger mt-3" role="alert" style="display: none;">
+                            An error occurred while processing your request.
+                        </div>
+
+                        <!-- Latest Response Section -->
+                        <div id="latestResponse" class="alert alert-success mt-3" role="alert" style="display: none;">
+                            <h4 class="alert-heading">Latest Response:</h4>
+                            <div id="responseContent"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Include Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!-- Axios for making HTTP requests -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        document.getElementById('questionForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const questionInput = document.getElementById('questionInput');
+            const question = questionInput.value;
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            const errorAlert = document.getElementById('errorAlert');
+            const latestResponse = document.getElementById('latestResponse');
+            const responseContent = document.getElementById('responseContent');
+            const responseHistory = document.getElementById('responseHistory');
+            const submitButton = document.getElementById('submitButton');
+
+            // Clear previous error and response
+            errorAlert.style.display = 'none';
+            latestResponse.style.display = 'none';
+
+            // Show loading spinner
+            loadingSpinner.style.display = 'inline-block';
+            submitButton.disabled = true;
+
+            try {
+                // Make POST request to the Flask server
+                const res = await axios.post('/', { question });
+
+                // Get the response text
+                const responseText = res.data.response;
+
+                // Create new response entry
+                const newResponse = { question, response: responseText };
+
+                // Append to response history
+                const historyItem = document.createElement('li');
+                historyItem.className = 'list-group-item';
+                historyItem.innerHTML = `<strong>Q:</strong> ${newResponse.question}<br><strong>A:</strong> ${newResponse.response}`;
+                responseHistory.insertBefore(historyItem, responseHistory.firstChild);
+
+                // Show the latest response
+                latestResponse.style.display = 'block';
+                if (responseText.includes('\n')) {
+                    // If response contains newlines, parse it to a table
+                    responseContent.innerHTML = renderTable(parseResponseToTable(responseText));
+                } else {
+                    responseContent.textContent = responseText;
+                }
+            } catch (error) {
+                console.error(error);
+                errorAlert.style.display = 'block';
+            } finally {
+                // Hide loading spinner
+                loadingSpinner.style.display = 'none';
+                submitButton.disabled = false;
+                questionInput.value = ''; // Clear the input field
+            }
+        });
+
+        // Function to parse response into a table format
+        function parseResponseToTable(response) {
+            const lines = response.split('\n');
+            const data = lines.map(line => {
+                const [key, value] = line.split(':').map(part => part.trim());
+                return { key, value };
+            });
+            return data.filter(item => item.key && item.value);
+        }
+
+        // Function to render data as a table
+        function renderTable(data) {
+            let table = '<table class="table table-striped table-bordered mt-3">';
+            table += '<thead><tr><th>Field</th><th>Value</th></tr></thead><tbody>';
+            data.forEach(item => {
+                table += `<tr><td>${item.key}</td><td>${item.value}</td></tr>`;
+            });
+            table += '</tbody></table>';
+            return table;
+        }
+    </script>
+</body>
+</html>
