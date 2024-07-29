@@ -152,17 +152,17 @@ def allowed_file(filename):
 
 def ReturnUserAnswer(userQuestion):
     # Get API key from environment variables
-    api_key = os.getenv("OPENAI_API_KEY")
-    if not api_key:
-        return "API key not found in environment variables."
+    # api_key = os.getenv("OPENAI_API_KEY")
+    # if not api_key:
+    #     return "API key not found in environment variables."
 
-    if not last_uploaded_file:
-        return "No CSV file uploaded yet."
+    # if not last_uploaded_file:
+    #     return "No CSV file uploaded yet."
 
     try:
         # Create the agent with the OpenAI API key and the uploaded CSV file
         agent = create_csv_agent(
-            ChatOpenAI(temperature=0, model="gpt-3.5-turbo-1106", api_key=api_key),
+            ChatOpenAI(temperature=0, model="gpt-3.5-turbo-1106", api_key="sk-proj-FvqMEq3YoR8KRUHOdEYpT3BlbkFJ8hkDrfQ8RqvdBp0PoKlD"),
             last_uploaded_file,
             verbose=True,
         )
